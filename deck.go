@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"math/rand"
 	"os"
 	"strings"
 )
@@ -14,7 +15,7 @@ func newDeck() deck {
 	cards := deck{}
 
 	cardSuits := []string{"Clubs", "Diamonds", "Hearts", "Spades"}
-	cardValues := []string{"Ace", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Jack", "Queen", "King"}
+	cardValues := []string{"Ace", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Jack", "Queen", "King"}
 
 	// Index is replaced with underscore to tell Go that we don't want to use it
 	for _, suit := range cardSuits {
@@ -28,12 +29,12 @@ func newDeck() deck {
 
 // Print out the value of each card in a deck
 func (d deck) print() {
-	for _, card := range d {
-		fmt.Println(card)
+	for i, card := range d {
+		fmt.Println(i, card)
 	}
 }
 
-// Return a hand (deck of `handSize` cards) and the remaining deck (deck of d.size - `handSize` cards)
+// Return a hand (deck of `handSize` cards) and the remaining deck (deck of len(d) - `handSize` cards)
 func deal(d deck, handSize int) (deck, deck) {
 	return d[:handSize], d[handSize:] // Return everything upto `handSize` and everything after it
 }
@@ -57,4 +58,12 @@ func newDeckFromFile(filename string) deck {
 	}
 	s := strings.Split(string(bs), ",")
 	return deck(s)
+}
+
+// Loops through deck, moves deck[i] to random position in deck
+func (d deck) shuffle() {
+	for i := range d {
+		newPos := rand.Intn(len(d) - 1)
+		d[i], d[newPos] = d[newPos], d[i]
+	}
 }
