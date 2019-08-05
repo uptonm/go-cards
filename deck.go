@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"math/rand"
+	"os"
 	"strings"
 	"time"
 )
@@ -58,16 +59,25 @@ func (d deck) saveToFile(filename string) error {
 	return ioutil.WriteFile(filename, []byte(d.toString()), 0666)
 }
 
-// // Reads byte string from file, splits at "," to create []string, then converts to deck type
-// func newDeckFromFile(filename string) deck {
-// 	bs, err := ioutil.ReadFile(filename)
-// 	if err != nil {
-// 		fmt.Println("Err:", err)
-// 		os.Exit(1)
-// 	}
-// 	s := strings.Split(string(bs), ",")
-// 	return deck(s)
-// }
+// Reads byte string from file, splits at "," to create []string, then converts to deck type
+func newDeckFromFile(filename string) deck {
+	bs, err := ioutil.ReadFile(filename)
+	if err != nil {
+		fmt.Println("Err:", err)
+		os.Exit(1)
+	}
+	s := strings.Split(string(bs), ",")
+	d := deck{}
+	for _, str := range s {
+		d = append(d, cardFromString(str))
+	}
+	return d
+}
+
+func cardFromString(s string) card {
+	values := strings.Split(s, " of ")
+	return card{values[0], values[1]}
+}
 
 // Loops through deck, moves deck[i] to random position in deck
 func (d deck) shuffle() {
