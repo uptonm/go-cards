@@ -4,13 +4,17 @@ import (
 	"fmt"
 	"io/ioutil"
 	"math/rand"
-	"os"
 	"strings"
 	"time"
 )
 
+type card struct {
+	suit  string
+	value string
+}
+
 // Create a new type "Deck" that is a Slice of type String
-type deck []string
+type deck []card
 
 func newDeck() deck {
 	cards := deck{}
@@ -21,7 +25,7 @@ func newDeck() deck {
 	// Index is replaced with underscore to tell Go that we don't want to use it
 	for _, suit := range cardSuits {
 		for _, value := range cardValues {
-			cards = append(cards, value+" of "+suit)
+			cards = append(cards, card{suit, value})
 		}
 	}
 
@@ -31,7 +35,7 @@ func newDeck() deck {
 // Print out the value of each card in a deck
 func (d deck) print() {
 	for i, card := range d {
-		fmt.Println(i, card)
+		fmt.Println(i, card.value+" of "+card.suit)
 	}
 }
 
@@ -42,7 +46,11 @@ func deal(d deck, handSize int) (deck, deck) {
 
 // Convert deck to string joined by commas
 func (d deck) toString() string {
-	return strings.Join([]string(d), ",")
+	arr := []string{}
+	for _, card := range d {
+		arr = append(arr, card.value+" of "+card.suit)
+	}
+	return strings.Join(arr, ",")
 }
 
 // Save deck to file for repeated usage, returns error if thrown
@@ -50,16 +58,16 @@ func (d deck) saveToFile(filename string) error {
 	return ioutil.WriteFile(filename, []byte(d.toString()), 0666)
 }
 
-// Reads byte string from file, splits at "," to create []string, then converts to deck type
-func newDeckFromFile(filename string) deck {
-	bs, err := ioutil.ReadFile(filename)
-	if err != nil {
-		fmt.Println("Err:", err)
-		os.Exit(1)
-	}
-	s := strings.Split(string(bs), ",")
-	return deck(s)
-}
+// // Reads byte string from file, splits at "," to create []string, then converts to deck type
+// func newDeckFromFile(filename string) deck {
+// 	bs, err := ioutil.ReadFile(filename)
+// 	if err != nil {
+// 		fmt.Println("Err:", err)
+// 		os.Exit(1)
+// 	}
+// 	s := strings.Split(string(bs), ",")
+// 	return deck(s)
+// }
 
 // Loops through deck, moves deck[i] to random position in deck
 func (d deck) shuffle() {
